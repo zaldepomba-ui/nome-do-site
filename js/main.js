@@ -1,5 +1,5 @@
 ﻿/* ============================================================
-   NutriIA — main.js  (ANIMAÇÕES DE ENTRADA)
+   NutriIA — main.js  (ANIMAÇÕES DE ENTRADA + VÍDEO + COOKIES)
    ------------------------------------------------------------
    FILOSOFIA: movimento serve à narrativa. Scroll nativo do
    navegador + GSAP ScrollTrigger só para os reveals.
@@ -11,16 +11,16 @@
      4. REVEALS gerais (.reveal soltos)
      5. CHAT (Como funciona): balões aparecem um a um (cascata)
      6. OFERTA: contador 0->20 quando entra na tela
-     7. CTA flutuante + cookies (LGPD)
+     7. CTA flutuante
+     8. VÍDEO: overlay com ícone de play (some ao dar play)
+     9. COOKIES (LGPD) + rastreadores (só com consentimento)
 
    SEGURANÇA:
-     - prefers-reduced-motion -> desliga tudo, conteúdo 100% visível
+     - prefers-reduced-motion -> desliga as animações, conteúdo 100% visível
      - sem GSAP -> nada some (anti-tela-branca)
      - fromTo garante estado final
-
-   OBS: o antigo formulário de reserva foi removido. Não há mais
-   validação/máscara/submit aqui — a conversão agora é o botão
-   "Garantir minha vaga" (link da Kiwify) na seção de fechamento.
+     - o bloco de vídeo/cookies roda SEMPRE (fora do if do GSAP),
+       então funciona mesmo sem animação.
    ============================================================ */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -194,7 +194,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Sem GSAP ou reduceMotion: não marca .js-anim -> tudo já visível.
 
   /* =========================================================
-     CTA FLUTUANTE — aparece depois do hero
+     7. CTA FLUTUANTE — aparece depois do hero
      ========================================================= */
   const floatCta = document.querySelector('.float-cta');
   const heroEl = document.querySelector('.hero');
@@ -206,7 +206,34 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   /* =========================================================
-     COOKIES (LGPD) — mostra se ainda não escolheu
+     8. VÍDEO — overlay com ícone de play
+     (movido do <script> que estava solto no HTML)
+     Some ao dar play, volta ao pausar. Protegido contra
+     ausência dos elementos.
+     ========================================================= */
+  const video = document.getElementById('mainVideo');
+  const overlay = document.getElementById('videoOverlay');
+  const pauseIcon = document.getElementById('pauseIcon');
+
+  if (video && overlay && pauseIcon) {
+    const showOverlay = () => {
+      overlay.style.opacity = '1';
+      pauseIcon.style.opacity = '1';
+    };
+    const hideOverlay = () => {
+      overlay.style.opacity = '0';
+      pauseIcon.style.opacity = '0';
+    };
+
+    video.addEventListener('play', hideOverlay);
+    video.addEventListener('pause', showOverlay);
+
+    // estado inicial: overlay visível
+    showOverlay();
+  }
+
+  /* =========================================================
+     9. COOKIES (LGPD) — mostra se ainda não escolheu
      ========================================================= */
   const cookies = document.getElementById('cookies');
   const cookiesOk = document.getElementById('cookies-ok');

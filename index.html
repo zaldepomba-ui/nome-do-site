@@ -1,22 +1,25 @@
 <!DOCTYPE html>
 <!--
   ============================================================
-  AGÊNCIA NT — Landing Page de Validação | Assistente de IA Alimentar
+  AGÊNCIA NT — Landing Page de Validação | NutriIA
   ============================================================
   ESTRUTURA DA PÁGINA (a "planta da casa"):
-    1. HERO      → IMAGEM DE FUNDO (com overlay degradê preto) + headline + sub + CTA + selo
-    2. VÍDEO     → área reservada p/ vídeo, com FOTO DE FUNDO atrás do bloco
-    3. BENEFÍCIOS→ 3 cards, cada um com FOTO DE FUNDO (sem ícone) + overlay
+    1. HERO      → imagem de fundo (overlay degradê) + headline + sub + CTA + selo
+    2. VÍDEO     → vídeo de vendas com foto de fundo atrás do bloco
+    3. BENEFÍCIOS→ 3 cards com foto de fundo + overlay
     4. OFERTA    → ancoragem de preço (R$19/mês) + reserva por R$2,47
-    5. COMO FUNCIONA → demonstração de chat (IA respondendo) + fluxo de pagamento
+    5. COMO FUNCIONA → chat (mockup) + fluxo de pagamento
     6. FECHAMENTO→ CTA final (link Kiwify)
     7. RODAPÉ    → 3 colunas + aviso legal + LGPD
 
   ARQUIVOS:
-    ./css/style.css  → toda a pintura
-    ./js/main.js     → animações GSAP (só de entrada) + máscara whats + cookies
+    /css/style.css  → toda a pintura
+    /js/main.js     → animações GSAP (entrada) + vídeo + cookies LGPD
 
-  SCROLL: nativo do navegador (limpo, sem inércia). O Lenis foi removido.
+  CAMINHOS (Vite): tudo que está em public/ é referenciado começando
+  com "/" e SEM escrever "public". Ex: public/hero.png  ->  /hero.png
+
+  SCROLL: nativo do navegador (sem inércia). Lenis removido.
   ============================================================
 -->
 <html lang="pt-BR">
@@ -32,10 +35,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;600&display=swap" rel="stylesheet" />
 
   <!-- Preload da imagem LCP (hero). -->
-  <link rel="preload" as="image" href="./public/hero.png" fetchpriority="high" />
+  <link rel="preload" as="image" href="/hero.png" fetchpriority="high" />
 
   <!-- Pintura -->
-  <link rel="stylesheet" href="./css/style.css" />
+  <link rel="stylesheet" href="/css/style.css" />
 </head>
 <body>
 
@@ -55,7 +58,7 @@
 
       <img
         class="hero__bg"
-        src="./public/hero.png"
+        src="/hero.png"
         alt=""
         aria-hidden="true"
         fetchpriority="high"
@@ -90,7 +93,7 @@
 
       <img
         class="video-section__bg"
-        src="./image1.png"
+        src="/image1.png"
         alt=""
         aria-hidden="true"
         loading="lazy"
@@ -101,44 +104,21 @@
         <h2 class="section__title reveal" data-anim="up">Veja como funciona</h2>
 
         <!-- ================================================================
-             AQUI VOCÊ INSERE O VÍDEO DE VENDAS.
-             Quando tiver o arquivo:
-               1. Salve em ./public/vendas.mp4 e ./public/poster.jpg
-               2. Troque o bloco abaixo por:
-                  <video controls poster="./public/poster.jpg" preload="none">
-                    <source src="./public/vendas.mp4" type="video/mp4" />
-                  </video>
+             VÍDEO DE VENDAS.
+             Pra trocar o vídeo: salve o arquivo em public/ (ex: vendas.mp4)
+             e um poster em public/ (ex: poster.jpg). Depois troque src e
+             adicione poster="/poster.jpg".
+             A lógica do overlay (ícone de play) está no /js/main.js.
              ================================================================ -->
-        <div style="position: relative; width: 100%; background: #000;">
-          <video controls preload="auto" crossorigin="anonymous" id="mainVideo" style="position: relative; z-index: 1;">
-            <source src="./public/video1.mp4" type="video/mp4" />
+        <div class="video-wrap">
+          <video controls preload="auto" crossorigin="anonymous" id="mainVideo" class="video-wrap__player">
+            <source src="/video1.mp4" type="video/mp4" />
             Seu navegador não suporta vídeo em HTML5.
           </video>
-          <div id="videoOverlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(2px); border-radius: 14px; pointer-events: none; z-index: 10; transition: opacity 0.3s; opacity: 1; display: flex; align-items: center; justify-content: center;">
-            <div id="pauseIcon" style="font-size: 80px; color: rgba(255, 255, 255, 0.7); text-shadow: 0 4px 12px rgba(0, 0, 0, 0.5); transition: opacity 0.3s; opacity: 1;">▶</div>
+          <div id="videoOverlay" class="video-wrap__overlay">
+            <div id="pauseIcon" class="video-wrap__icon">▶</div>
           </div>
         </div>
-
-        <script>
-          const video = document.getElementById('mainVideo');
-          const overlay = document.getElementById('videoOverlay');
-          const pauseIcon = document.getElementById('pauseIcon');
-          
-          video.addEventListener('play', () => {
-            overlay.style.opacity = '0';
-            overlay.style.pointerEvents = 'none';
-            pauseIcon.style.opacity = '0';
-          });
-          
-          video.addEventListener('pause', () => {
-            overlay.style.opacity = '1';
-            pauseIcon.style.opacity = '1';
-          });
-          
-          // Mostra overlay e ícone no início
-          overlay.style.opacity = '1';
-          pauseIcon.style.opacity = '1';
-        </script>
       </div>
     </section>
 
@@ -153,7 +133,7 @@
           <article class="card reveal" data-anim="up">
             <img
               class="card__bg"
-              src="./public/muie.png"
+              src="/muie.png"
               alt=""
               aria-hidden="true"
               loading="lazy"
@@ -169,7 +149,7 @@
           <article class="card reveal" data-anim="up">
             <img
               class="card__bg"
-              src="./public/dois.png"
+              src="/dois.png"
               alt=""
               aria-hidden="true"
               loading="lazy"
@@ -185,7 +165,7 @@
           <article class="card reveal" data-anim="up">
             <img
               class="card__bg"
-              src="./public/sofa.png"
+              src="/sofa.png"
               alt=""
               aria-hidden="true"
               loading="lazy"
@@ -215,10 +195,7 @@
       </div>
     </section>
 
-    <!-- ============ 5. COMO FUNCIONA (chat fake + fluxo de pagamento) ============
-         Substituiu o antigo formulário de reserva. Mantém a âncora #reserva
-         pra todos os CTAs ("Reservar minha vaga", "Quero reservar") continuarem
-         funcionando — eles agora trazem o usuário pra esta demonstração. -->
+    <!-- ============ 5. COMO FUNCIONA (chat mockup + fluxo de pagamento) ============ -->
     <section class="section como" id="reserva">
 
       <!-- glows decorativos de fundo (profundidade sutil) -->
@@ -378,9 +355,15 @@
     </div>
   </div>
 
-  <!-- GSAP com DEFER (não bloqueia render). Ordem: gsap → scrolltrigger → main.js -->
-  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-  <script defer src="./js/main.js"></script>
+  <!-- ============================================================
+       SCRIPTS — ORDEM IMPORTA
+       GSAP e ScrollTrigger SEM defer: precisam estar prontos
+       (window.gsap definido) ANTES do main.js rodar.
+       main.js com defer: roda depois do DOM montado, e como as
+       libs acima já carregaram de forma síncrona, o GSAP existe.
+       ============================================================ -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script defer src="/js/main.js"></script>
 </body>
 </html>
