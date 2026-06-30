@@ -1,32 +1,37 @@
 ﻿/* ============================================================
-   NutriIA — main.js  (ANIMAÇÕES DE ENTRADA + VÍDEO + COOKIES)
+   NutriIA — main.js  (ANIMAÇÕES + VÍDEO + COOKIES)
    ------------------------------------------------------------
-   FILOSOFIA: movimento serve à narrativa. Scroll nativo do
-   navegador + GSAP ScrollTrigger só para os reveals.
+   GSAP agora vem do PROJETO (npm), não mais de CDN.
+   É por isso que tem os dois imports aqui no topo. O Vite
+   empacota o GSAP junto no build -> funciona igual local e no ar.
+   (Antes vinha de CDN e quebrava no deploy: sem animação no ar.)
 
    O QUE TEM AQUI:
      1. Barra de progresso de scroll (topo)
-     2. HERO: título revelado palavra a palavra + reveals de entrada
+     2. HERO: título palavra a palavra + reveals de entrada
      3. CARDS: cascata 3D (rotationX + stagger)
      4. REVEALS gerais (.reveal soltos)
-     5. CHAT (Como funciona): balões aparecem um a um (cascata)
-     6. OFERTA: contador 0->20 quando entra na tela
+     5. CHAT (Como funciona): balões um a um (cascata)
+     6. OFERTA: contador 0->20 ao entrar na tela
      7. CTA flutuante
-     8. VÍDEO: overlay com ícone de play (some ao dar play)
+     8. VÍDEO: overlay (vidro fumê) + triângulo de play
      9. COOKIES (LGPD) + rastreadores (só com consentimento)
 
    SEGURANÇA:
-     - prefers-reduced-motion -> desliga as animações, conteúdo 100% visível
+     - prefers-reduced-motion -> desliga animações, conteúdo 100% visível
      - sem GSAP -> nada some (anti-tela-branca)
      - fromTo garante estado final
-     - o bloco de vídeo/cookies roda SEMPRE (fora do if do GSAP),
-       então funciona mesmo sem animação.
+     - vídeo/cookies rodam SEMPRE (fora do if do GSAP)
    ============================================================ */
+
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 document.addEventListener('DOMContentLoaded', () => {
 
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const hasGSAP = typeof window.gsap !== 'undefined' && typeof window.ScrollTrigger !== 'undefined';
+  // GSAP agora vem do import (não é mais window.gsap do CDN).
+  const hasGSAP = typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined';
 
   /* =========================================================
      BLOCO DE ANIMAÇÕES — só liga com GSAP e sem reduceMotion
@@ -36,9 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.documentElement.classList.add('js-anim');
     gsap.registerPlugin(ScrollTrigger);
 
-    /* -------------------------------------------------------
-       1. BARRA DE PROGRESSO DE SCROLL (topo)
-       ------------------------------------------------------- */
+    /* 1. BARRA DE PROGRESSO DE SCROLL (topo) */
     const bar = document.getElementById('scroll-progress');
     if (bar) {
       gsap.to(bar, {
@@ -48,9 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
 
-    /* -------------------------------------------------------
-       2. HERO — título palavra a palavra + reveals de entrada
-       ------------------------------------------------------- */
+    /* 2. HERO — título palavra a palavra + reveals de entrada */
     const hero = document.querySelector('.hero');
 
     const heroBg = document.querySelector('.hero__bg');
@@ -68,7 +69,6 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
 
-    // título do hero: quebra em palavras e revela uma a uma (mask reveal)
     const heroTitle = document.querySelector('.hero__title');
     if (heroTitle && !heroTitle.dataset.split) {
       heroTitle.dataset.split = '1';
@@ -104,9 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
       );
     }
 
-    /* -------------------------------------------------------
-       3. CARDS — cascata 3D (rotationX + stagger)
-       ------------------------------------------------------- */
+    /* 3. CARDS — cascata 3D (rotationX + stagger) */
     const staggeredEls = new Set();
     document.querySelectorAll('[data-stagger]').forEach((group) => {
       const items = group.querySelectorAll('.reveal');
@@ -122,9 +120,7 @@ document.addEventListener('DOMContentLoaded', () => {
       );
     });
 
-    /* -------------------------------------------------------
-       4. REVEALS GERAIS (.reveal soltos)
-       ------------------------------------------------------- */
+    /* 4. REVEALS GERAIS (.reveal soltos) */
     const fromByType = (type) => {
       const v = { opacity: 0 };
       if (type === 'up')    v.y = 56;
@@ -148,9 +144,7 @@ document.addEventListener('DOMContentLoaded', () => {
       );
     });
 
-    /* -------------------------------------------------------
-       5. CHAT (Como funciona) — balões em cascata
-       ------------------------------------------------------- */
+    /* 5. CHAT (Como funciona) — balões em cascata */
     const chat = document.querySelector('[data-chat]');
     if (chat) {
       const msgs = chat.querySelectorAll('[data-msg]');
@@ -160,21 +154,17 @@ document.addEventListener('DOMContentLoaded', () => {
         scrollTrigger: { trigger: chat, start: 'top 75%', toggleActions: 'play none none reset' },
       });
 
-      // cada balão sobe e aparece, um depois do outro
       tl.fromTo(msgs,
         { opacity: 0, y: 16 },
         { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out', stagger: 0.5 }
       );
 
-      // o "digitando" aparece depois do último balão
       if (typing) {
         tl.to(typing, { opacity: 1, duration: 0.4, ease: 'power2.out' }, '+=0.1');
       }
     }
 
-    /* -------------------------------------------------------
-       6. OFERTA — contador 0 -> N quando entra na tela
-       ------------------------------------------------------- */
+    /* 6. OFERTA — contador 0 -> N quando entra na tela */
     document.querySelectorAll('[data-count]').forEach((el) => {
       const target = parseInt(el.dataset.count, 10) || 0;
       const obj = { v: 0 };
@@ -185,7 +175,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
 
-    // refresh quando muda a altura -> trigger não desalinha
+    /* refresh quando muda a altura -> trigger não desalinha */
     window.addEventListener('load', () => ScrollTrigger.refresh());
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => ScrollTrigger.refresh());
     let rt;
@@ -206,30 +196,26 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   /* =========================================================
-     8. VÍDEO — overlay com ícone de play
-     (movido do <script> que estava solto no HTML)
-     Some ao dar play, volta ao pausar. Protegido contra
-     ausência dos elementos.
+     8. VÍDEO — vidro fumê (overlay) + triângulo de play
+     O vidro fumê aparece em todas as telas (controlado no CSS).
+     O triângulo (▶) só aparece em PC/notebook (também via CSS).
+     Aqui só controlamos mostrar/esconder ao dar play/pause.
      ========================================================= */
   const video = document.getElementById('mainVideo');
   const overlay = document.getElementById('videoOverlay');
   const pauseIcon = document.getElementById('pauseIcon');
 
-  if (video && overlay && pauseIcon) {
-    const showOverlay = () => {
-      overlay.style.opacity = '1';
-      pauseIcon.style.opacity = '1';
-    };
-    const hideOverlay = () => {
-      overlay.style.opacity = '0';
-      pauseIcon.style.opacity = '0';
-    };
+  if (video && overlay) {
+    // Só mexemos no vidro fumê (overlay). O triângulo (pauseIcon) é
+    // mostrado/escondido pelo CSS conforme o tamanho da tela (media query),
+    // então NÃO forçamos opacity nele aqui — senão atropela o CSS.
+    const showOverlay = () => { overlay.style.opacity = '1'; };
+    const hideOverlay = () => { overlay.style.opacity = '0'; };
 
     video.addEventListener('play', hideOverlay);
     video.addEventListener('pause', showOverlay);
 
-    // estado inicial: overlay visível
-    showOverlay();
+    showOverlay(); // estado inicial: vidro fumê visível
   }
 
   /* =========================================================
@@ -246,12 +232,7 @@ document.addEventListener('DOMContentLoaded', () => {
     try { localStorage.setItem('cookie-ok', value); } catch (_) {}
   };
 
-  /* ----------------------------------------------------------
-     RASTREADORES (Pixel do Meta / Google Analytics)
-     Só dispara quando o usuário ACEITA (ou já tinha aceitado).
-     Quem recusa nunca dispara nada. trackersLoaded trava
-     disparo duplo.
-     ---------------------------------------------------------- */
+  /* RASTREADORES (Pixel do Meta / GA4): só dispara com consentimento. */
   let trackersLoaded = false;
   function loadTrackers() {
     if (trackersLoaded) return;
@@ -313,7 +294,6 @@ document.addEventListener('DOMContentLoaded', () => {
     cookiesNo.addEventListener('click', () => {
       hideCookiesBanner();
       saveCookieChoice('0');
-      // recusou → não dispara rastreador (LGPD).
     });
   }
 

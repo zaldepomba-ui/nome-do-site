@@ -615,3 +615,55 @@ html:not(.js-anim) .scroll-progress { display: none; }
   .float-cta { transition: none; }
   .card:hover .card__bg { transform: none; }
 }
+/* ============================================================
+   VÍDEO — vidro fumê (todas as telas) + triângulo (só PC/notebook)
+   COLE ESTE BLOCO NO FINAL DO SEU css/style.css
+   ============================================================ */
+.video-wrap {
+  position: relative;
+  width: 100%;
+  background: #000;
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.video-wrap__player {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  display: block;
+  border-radius: 14px;
+}
+
+/* O VIDRO FUMÊ — aparece em TODAS as telas (celular, tablet, PC) */
+.video-wrap__overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  border-radius: 14px;
+  pointer-events: none;
+  z-index: 10;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+/* O TRIÂNGULO DE PLAY — escondido por padrão (vale pra celular/tablet) */
+.video-wrap__icon {
+  font-size: 80px;
+  color: rgba(255, 255, 255, 0.7);
+  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  transition: opacity 0.3s ease;
+  display: none;          /* celular/tablet: SEM triângulo, só vidro fumê */
+}
+
+/* PC / notebook / computador (tela a partir de 1024px): MOSTRA o triângulo */
+@media (min-width: 1024px) {
+  .video-wrap__icon {
+    display: block;       /* só aqui o triângulo aparece */
+  }
+}

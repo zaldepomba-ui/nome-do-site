@@ -16,8 +16,12 @@
     /css/style.css  → toda a pintura
     /js/main.js     → animações GSAP (entrada) + vídeo + cookies LGPD
 
-  CAMINHOS (Vite): tudo que está em public/ é referenciado começando
-  com "/" e SEM escrever "public". Ex: public/hero.png  ->  /hero.png
+  GSAP: agora vem do PROJETO (npm), importado dentro do main.js.
+        Não depende mais de CDN externo (que quebrava no deploy).
+        Por isso o main.js é carregado como type="module".
+
+  CAMINHOS (Vite): tudo em public/ é referenciado começando com "/"
+  e SEM escrever "public". Ex: public/hero.png -> /hero.png
 
   SCROLL: nativo do navegador (sem inércia). Lenis removido.
   ============================================================
@@ -108,7 +112,12 @@
              Pra trocar o vídeo: salve o arquivo em public/ (ex: vendas.mp4)
              e um poster em public/ (ex: poster.jpg). Depois troque src e
              adicione poster="/poster.jpg".
-             A lógica do overlay (ícone de play) está no /js/main.js.
+
+             VIDRO FUMÊ + TRIÂNGULO:
+               - O vidro fumê (overlay escuro com blur) aparece em TODAS as telas.
+               - O triângulo de play (▶) aparece SÓ em PC/notebook (tela larga).
+                 No celular/tablet ele fica escondido (controlado pelo CSS).
+               - A lógica de mostrar/esconder ao dar play está no /js/main.js.
              ================================================================ -->
         <div class="video-wrap">
           <video controls preload="auto" crossorigin="anonymous" id="mainVideo" class="video-wrap__player">
@@ -131,13 +140,7 @@
 
           <!-- CARD 1 -->
           <article class="card reveal" data-anim="up">
-            <img
-              class="card__bg"
-              src="/muie.png"
-              alt=""
-              aria-hidden="true"
-              loading="lazy"
-            />
+            <img class="card__bg" src="/muie.png" alt="" aria-hidden="true" loading="lazy" />
             <div class="card__overlay" aria-hidden="true"></div>
             <div class="card__content">
               <h3 class="card__title">Entenda seus macros</h3>
@@ -147,13 +150,7 @@
 
           <!-- CARD 2 -->
           <article class="card reveal" data-anim="up">
-            <img
-              class="card__bg"
-              src="/dois.png"
-              alt=""
-              aria-hidden="true"
-              loading="lazy"
-            />
+            <img class="card__bg" src="/dois.png" alt="" aria-hidden="true" loading="lazy" />
             <div class="card__overlay" aria-hidden="true"></div>
             <div class="card__content">
               <h3 class="card__title">Ideias de refeição na hora</h3>
@@ -163,13 +160,7 @@
 
           <!-- CARD 3 -->
           <article class="card reveal" data-anim="up">
-            <img
-              class="card__bg"
-              src="/sofa.png"
-              alt=""
-              aria-hidden="true"
-              loading="lazy"
-            />
+            <img class="card__bg" src="/sofa.png" alt="" aria-hidden="true" loading="lazy" />
             <div class="card__overlay" aria-hidden="true"></div>
             <div class="card__content">
               <h3 class="card__title">Tire dúvidas a qualquer hora</h3>
@@ -210,7 +201,6 @@
 
         <!-- ===== JANELA DE CHAT (mockup) ===== -->
         <div class="chat reveal" data-anim="scale" data-chat>
-          <!-- barra superior estilo app -->
           <div class="chat__top">
             <span class="chat__avatar" aria-hidden="true">N</span>
             <div class="chat__id">
@@ -219,40 +209,28 @@
             </div>
           </div>
 
-          <!-- corpo das mensagens -->
           <div class="chat__body">
-
-            <!-- pergunta 1 (usuário, direita) -->
             <div class="msg msg--user" data-msg>
               <p class="bubble">Comi 2 ovos e uma banana no café. Tá bom isso?</p>
             </div>
-
-            <!-- resposta 1 (IA, esquerda) -->
             <div class="msg msg--ia" data-msg>
               <p class="bubble">
                 Bom combo pra começar o dia — proteína do ovo + carbo da banana. 👌 Como você me disse semana passada que tá tentando treinar em jejum, talvez valha adiantar a banana pra antes do treino. Quer que eu te lembre disso amanhã?
               </p>
             </div>
-
-            <!-- pergunta 2 (usuário, direita) -->
             <div class="msg msg--user" data-msg>
               <p class="bubble">Tenho frango e arroz em casa. Almoço fácil?</p>
             </div>
-
-            <!-- resposta 2 (IA, esquerda) -->
             <div class="msg msg--ia" data-msg>
               <p class="bubble">
                 Clássico que funciona: frango + arroz + um vegetal pra fechar. Lembrando que você comentou que não curte brócolis 😄 — abacaxi ou tomate ao lado caem bem. Anotado aqui no seu histórico.
               </p>
             </div>
-
-            <!-- "digitando" pra dar vida (animado) -->
             <div class="msg msg--ia" data-typing>
               <p class="bubble bubble--typing" aria-label="NutriIA está digitando">
                 <span></span><span></span><span></span>
               </p>
             </div>
-
           </div>
         </div>
 
@@ -356,14 +334,10 @@
   </div>
 
   <!-- ============================================================
-       SCRIPTS — ORDEM IMPORTA
-       GSAP e ScrollTrigger SEM defer: precisam estar prontos
-       (window.gsap definido) ANTES do main.js rodar.
-       main.js com defer: roda depois do DOM montado, e como as
-       libs acima já carregaram de forma síncrona, o GSAP existe.
+       SCRIPT — GSAP agora vem do projeto (import dentro do main.js).
+       type="module" é obrigatório pra usar import. O Vite empacota
+       o GSAP junto no build, então funciona igual local e no ar.
        ============================================================ -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-  <script defer src="/js/main.js"></script>
+  <script type="module" src="/js/main.js"></script>
 </body>
 </html>
