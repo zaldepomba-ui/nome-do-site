@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<!--
+  ============================================================
+  AGÊNCIA NT — Landing Page de Validação | Assistente de IA Alimentar
+  ============================================================
+  ESTRUTURA DA PÁGINA (a "planta da casa"):
+    1. HERO      → IMAGEM DE FUNDO (com overlay degradê preto) + headline + sub + CTA + selo
+    2. VÍDEO     → área reservada p/ vídeo, com FOTO DE FUNDO atrás do bloco
+    3. BENEFÍCIOS→ 3 cards, cada um com FOTO DE FUNDO (sem ícone) + overlay
+    4. OFERTA    → ancoragem de preço (R$19/mês) + reserva por R$2,47
+    5. COMO FUNCIONA → demonstração de chat (IA respondendo) + fluxo de pagamento
+    6. FECHAMENTO→ CTA final (link Kiwify)
+    7. RODAPÉ    → 3 colunas + aviso legal + LGPD
+
+  ARQUIVOS:
+    ./css/style.css  → toda a pintura
+    ./js/main.js     → animações GSAP (só de entrada) + máscara whats + cookies
+
+  SCROLL: nativo do navegador (limpo, sem inércia). O Lenis foi removido.
+  ============================================================
+-->
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NutriIA — Entenda de verdade o que você come</title>
+  <meta name="description" content="Assistente de IA que explica seus macros, dá ideias de refeição e tira dúvidas na hora. Conteúdo educativo." />
+
+  <!-- Fontes: Fraunces (display 600/700) + Inter (corpo 400/600). -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+
+  <!-- Preload da imagem LCP (hero). -->
+  <link rel="preload" as="image" href="./public/hero.png" fetchpriority="high" />
+
+  <!-- Pintura -->
+  <link rel="stylesheet" href="./css/style.css" />
+</head>
+<body>
+
+  <!-- ===== BARRA DE PROGRESSO DE SCROLL (fininha, no topo) ===== -->
+  <div class="scroll-progress" id="scroll-progress" aria-hidden="true"></div>
+
+  <!-- ===== HEADER (transparente, sobrepõe o hero) ===== -->
+  <header class="site-header">
+    <span class="brand">NutriIA</span>
+    <span class="brand-tag">por Agência NT</span>
+  </header>
+
+  <main>
+
+    <!-- ============ 1. HERO ============ -->
+    <section class="hero" id="topo">
+
+      <img
+        class="hero__bg"
+        src="./public/hero.png"
+        alt=""
+        aria-hidden="true"
+        fetchpriority="high"
+      />
+      <div class="hero__overlay" aria-hidden="true"></div>
+
+      <div class="hero__inner container">
+        <span class="badge reveal" data-anim="down">● <span data-count="20">20</span> primeiras vagas</span>
+
+        <h1 class="hero__title reveal" data-anim="up">
+          Pare de se perder em dieta.<br />
+          <span class="accent">Entenda de verdade o que você come.</span>
+        </h1>
+
+        <p class="hero__sub reveal" data-anim="up">
+          Seu assistente de IA que explica seus macros, dá ideias de refeição
+          e tira dúvidas na hora — sem achismo.
+        </p>
+
+        <a href="#reserva" class="btn btn--primary reveal" data-anim="up">
+          Reservar minha vaga
+        </a>
+
+        <p class="hero__micro reveal" data-anim="up">
+          O valor será convertido em crédito na sua primeira mensalidade.
+        </p>
+      </div>
+    </section>
+
+    <!-- ============ 2. VÍDEO DE VENDAS ============ -->
+    <section class="section video-section">
+
+      <img
+        class="video-section__bg"
+        src="./image1.png"
+        alt=""
+        aria-hidden="true"
+        loading="lazy"
+      />
+      <div class="video-section__overlay" aria-hidden="true"></div>
+
+      <div class="container">
+        <h2 class="section__title reveal" data-anim="up">Veja como funciona</h2>
+
+        <!-- ================================================================
+             AQUI VOCÊ INSERE O VÍDEO DE VENDAS.
+             Quando tiver o arquivo:
+               1. Salve em ./public/vendas.mp4 e ./public/poster.jpg
+               2. Troque o bloco abaixo por:
+                  <video controls poster="./public/poster.jpg" preload="none">
+                    <source src="./public/vendas.mp4" type="video/mp4" />
+                  </video>
+             ================================================================ -->
+        <div style="position: relative; width: 100%; background: #000;">
+          <video controls preload="auto" crossorigin="anonymous" id="mainVideo" style="position: relative; z-index: 1;">
+            <source src="./public/video1.mp4" type="video/mp4" />
+            Seu navegador não suporta vídeo em HTML5.
+          </video>
+          <div id="videoOverlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(2px); border-radius: 14px; pointer-events: none; z-index: 10; transition: opacity 0.3s; opacity: 1; display: flex; align-items: center; justify-content: center;">
+            <div id="pauseIcon" style="font-size: 80px; color: rgba(255, 255, 255, 0.7); text-shadow: 0 4px 12px rgba(0, 0, 0, 0.5); transition: opacity 0.3s; opacity: 1;">▶</div>
+          </div>
+        </div>
+
+        <script>
+          const video = document.getElementById('mainVideo');
+          const overlay = document.getElementById('videoOverlay');
+          const pauseIcon = document.getElementById('pauseIcon');
+          
+          video.addEventListener('play', () => {
+            overlay.style.opacity = '0';
+            overlay.style.pointerEvents = 'none';
+            pauseIcon.style.opacity = '0';
+          });
+          
+          video.addEventListener('pause', () => {
+            overlay.style.opacity = '1';
+            pauseIcon.style.opacity = '1';
+          });
+          
+          // Mostra overlay e ícone no início
+          overlay.style.opacity = '1';
+          pauseIcon.style.opacity = '1';
+        </script>
+      </div>
+    </section>
+
+    <!-- ============ 3. BENEFÍCIOS ============ -->
+    <section class="section benefits" style="background: url('/image2.png') center/cover no-repeat;">
+      <div class="container">
+        <h2 class="section__title reveal" data-anim="up">O que você ganha</h2>
+
+        <div class="benefits__grid" data-stagger>
+
+          <!-- CARD 1 -->
+          <article class="card reveal" data-anim="up">
+            <img
+              class="card__bg"
+              src="./public/muie.png"
+              alt=""
+              aria-hidden="true"
+              loading="lazy"
+            />
+            <div class="card__overlay" aria-hidden="true"></div>
+            <div class="card__content">
+              <h3 class="card__title">Entenda seus macros</h3>
+              <p class="card__text">Sem precisar de curso de nutrição. Você pergunta, a IA explica em linguagem clara.</p>
+            </div>
+          </article>
+
+          <!-- CARD 2 -->
+          <article class="card reveal" data-anim="up">
+            <img
+              class="card__bg"
+              src="./public/dois.png"
+              alt=""
+              aria-hidden="true"
+              loading="lazy"
+            />
+            <div class="card__overlay" aria-hidden="true"></div>
+            <div class="card__content">
+              <h3 class="card__title">Ideias de refeição na hora</h3>
+              <p class="card__text">Do seu jeito, com o que você tem. Nada de plano engessado que você não segue.</p>
+            </div>
+          </article>
+
+          <!-- CARD 3 -->
+          <article class="card reveal" data-anim="up">
+            <img
+              class="card__bg"
+              src="./public/sofa.png"
+              alt=""
+              aria-hidden="true"
+              loading="lazy"
+            />
+            <div class="card__overlay" aria-hidden="true"></div>
+            <div class="card__content">
+              <h3 class="card__title">Tire dúvidas a qualquer hora</h3>
+              <p class="card__text">Sem marcar consulta, sem esperar. A resposta vem na hora que a dúvida bate.</p>
+            </div>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 4. OFERTA (ancoragem) ============ -->
+    <section class="section offer">
+      <div class="container">
+        <div class="offer__card reveal" data-anim="scale">
+          <span class="offer__anchor">R$ 19/mês quando lançar</span>
+          <p class="offer__highlight">
+            Reserve sua vaga agora por <strong class="accent">R$ 2,47</strong>
+          </p>
+          <p class="offer__note">Vira crédito na sua primeira mensalidade.</p>
+          <a href="#reserva" class="btn btn--primary">Quero reservar</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 5. COMO FUNCIONA (chat fake + fluxo de pagamento) ============
+         Substituiu o antigo formulário de reserva. Mantém a âncora #reserva
+         pra todos os CTAs ("Reservar minha vaga", "Quero reservar") continuarem
+         funcionando — eles agora trazem o usuário pra esta demonstração. -->
+    <section class="section como" id="reserva">
+
+      <!-- glows decorativos de fundo (profundidade sutil) -->
+      <div class="como__glow como__glow--a" aria-hidden="true"></div>
+      <div class="como__glow como__glow--b" aria-hidden="true"></div>
+
+      <div class="container container--narrow">
+        <h2 class="section__title reveal" data-anim="up">Como funciona na prática</h2>
+        <p class="como__sub reveal" data-anim="up">
+          Você manda a dúvida, a IA responde na hora — direto e sem enrolação.
+        </p>
+
+        <!-- ===== JANELA DE CHAT (mockup) ===== -->
+        <div class="chat reveal" data-anim="scale" data-chat>
+          <!-- barra superior estilo app -->
+          <div class="chat__top">
+            <span class="chat__avatar" aria-hidden="true">N</span>
+            <div class="chat__id">
+              <span class="chat__name">NutriIA</span>
+              <span class="chat__status">● online agora</span>
+            </div>
+          </div>
+
+          <!-- corpo das mensagens -->
+          <div class="chat__body">
+
+            <!-- pergunta 1 (usuário, direita) -->
+            <div class="msg msg--user" data-msg>
+              <p class="bubble">Comi 2 ovos e uma banana no café. Tá bom isso?</p>
+            </div>
+
+            <!-- resposta 1 (IA, esquerda) -->
+            <div class="msg msg--ia" data-msg>
+              <p class="bubble">
+                Bom combo pra começar o dia — proteína do ovo + carbo da banana. 👌 Como você me disse semana passada que tá tentando treinar em jejum, talvez valha adiantar a banana pra antes do treino. Quer que eu te lembre disso amanhã?
+              </p>
+            </div>
+
+            <!-- pergunta 2 (usuário, direita) -->
+            <div class="msg msg--user" data-msg>
+              <p class="bubble">Tenho frango e arroz em casa. Almoço fácil?</p>
+            </div>
+
+            <!-- resposta 2 (IA, esquerda) -->
+            <div class="msg msg--ia" data-msg>
+              <p class="bubble">
+                Clássico que funciona: frango + arroz + um vegetal pra fechar. Lembrando que você comentou que não curte brócolis 😄 — abacaxi ou tomate ao lado caem bem. Anotado aqui no seu histórico.
+              </p>
+            </div>
+
+            <!-- "digitando" pra dar vida (animado) -->
+            <div class="msg msg--ia" data-typing>
+              <p class="bubble bubble--typing" aria-label="NutriIA está digitando">
+                <span></span><span></span><span></span>
+              </p>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ===== FLUXO DE PAGAMENTO (setinhas, PIX em destaque) ===== -->
+        <p class="pay-flow__lead reveal" data-anim="up">Pagamento simples e direto:</p>
+        <div class="pay-flow reveal" data-anim="up">
+          <div class="pay-flow__step pay-flow__step--featured">
+            <span class="pay-flow__icon" aria-hidden="true">⚡</span>
+            <span class="pay-flow__name">PIX</span>
+            <span class="pay-flow__tag">na hora</span>
+          </div>
+          <span class="pay-flow__arrow" aria-hidden="true">→</span>
+          <div class="pay-flow__step">
+            <span class="pay-flow__icon" aria-hidden="true">💳</span>
+            <span class="pay-flow__name">Crédito</span>
+          </div>
+        </div>
+        <p class="pay-flow__note reveal" data-anim="up">
+          Confirmação automática. Sua vaga é reservada na hora.
+        </p>
+
+      </div>
+    </section>
+
+    <!-- ============ 6. FECHAMENTO ============ -->
+    <section class="section closing">
+      <div class="container">
+        <h2 class="closing__title reveal" data-anim="up">
+          São só 20 vagas. Quando fechar, fechou.
+        </h2>
+        <!-- AQUI VOCÊ TROCA o # pelo seu link da Kiwify -->
+        <a href="#" class="btn btn--primary reveal" data-anim="up" id="cta-kiwify">
+          Garantir minha vaga
+        </a>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ============ 7. RODAPÉ ============ -->
+  <footer class="site-footer">
+    <div class="container footer__grid">
+
+      <div class="footer__col footer__col--brand">
+        <span class="footer__brand">NutriIA</span>
+        <p class="footer__pitch">Seu assistente de IA pra entender o que você come — sem achismo.</p>
+        <span class="footer__by">por Agência NT</span>
+      </div>
+
+      <div class="footer__col">
+        <span class="footer__h">Navegação</span>
+        <a href="#topo" class="footer__link">Início</a>
+        <a href="#reserva" class="footer__link">Como funciona</a>
+        <a href="#" class="footer__link">Política de Privacidade</a>
+      </div>
+
+      <div class="footer__col">
+        <span class="footer__h">Garanta sua vaga</span>
+        <p class="footer__pitch">Só 20 vagas. Reserve a sua.</p>
+      </div>
+
+    </div>
+
+    <div class="container footer__bottom">
+      <p class="footer__legal">
+        Conteúdo educativo sobre alimentação. Não constitui prescrição dietética
+        nem substitui consulta com nutricionista registrado.
+      </p>
+      <p class="footer__copy">© 2026 NutriIA · Agência NT</p>
+    </div>
+  </footer>
+
+  <!-- ===== BANNER DE COOKIES (LGPD) ===== -->
+  <div class="cookies" id="cookies" hidden>
+
+    <div class="cookies__body">
+      <p class="cookies__text">
+        Usamos cookies essenciais e cookies de medição/marketing.
+        Os não essenciais só ativam com o seu consentimento.
+        <button type="button" class="cookies__more" id="cookies-more" aria-expanded="false" aria-controls="cookies-details">
+          Saiba mais
+        </button>
+      </p>
+
+      <div class="cookies__details" id="cookies-details" hidden>
+        <p>
+          Utilizamos cookies essenciais (necessários para o funcionamento do site)
+          e cookies de medição e marketing (que nos ajudam a entender o desempenho
+          de nossos anúncios). Os cookies não essenciais só são ativados com o seu
+          consentimento. Você pode alterar sua escolha a qualquer momento. Para saber
+          como tratamos seus dados, consulte nossa
+          <a href="#">Política de Privacidade</a>.
+        </p>
+      </div>
+    </div>
+
+    <div class="cookies__actions">
+      <button class="btn btn--ghost btn--small cookies__btn--decline" id="cookies-no">Recusar</button>
+      <button class="btn btn--primary btn--small" id="cookies-ok">Aceitar</button>
+    </div>
+  </div>
+
+  <!-- GSAP com DEFER (não bloqueia render). Ordem: gsap → scrolltrigger → main.js -->
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script defer src="./js/main.js"></script>
+</body>
+</html>
